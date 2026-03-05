@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>C2 Dashboard</title>
+    <style>
+        body { font-family: monospace; background: #111; color: #00ff00; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #333; padding: 8px; text-align: left; }
+        th { background: #222; }
+        tr:hover { background: #1a1a1a; }
+    </style>
+</head>
+<body>
+    <h1>Project Cerberus — C&C Dashboard</h1>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Machine</th>
+            <th>Timestamp</th>
+            <th>Data</th>
+        </tr>
+        {% for row in rows %}
+        <tr>
+            <td>{{ row["id"] }}</td>
+            <td>{{ row["machine"] }}</td>
+            <td>{{ row["timestamp"] }}</td>
+            <td>{{ row["data"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
