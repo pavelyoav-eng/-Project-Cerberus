@@ -1,7 +1,7 @@
 import os
 import sqlite3
 import datetime
-from flask import Flask, request, render_template, g
+from flask import Flask, request, render_template
 from pathlib import Path
 
 app = Flask(__name__)
@@ -59,7 +59,7 @@ def dashboard():
     db.close()
     return render_template("index.html", rows=rows)
 
-# ── Entry point ───────────────────────────────────────────
+# start the server
 if __name__ == "__main__":
     init_db()
     app.run(debug=True, host="0.0.0.0", port=5000)
