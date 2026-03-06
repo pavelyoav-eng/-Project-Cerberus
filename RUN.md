@@ -31,3 +31,8 @@ In your browser open: **http://127.0.0.1:5000**
 ## 4. Stop the keylogger
 
 Press **Esc** in the keylogger terminal. The server can be stopped with **Ctrl+C**.
+
+
+TWO sited: 
+1) http://localhost:5000/ — passive keystroke capture dashboard
+2) http://localhost:5000/shell
