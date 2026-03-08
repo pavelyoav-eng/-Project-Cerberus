@@ -26,4 +26,4 @@ pip install -r requirements.txt
 ```
 
 ## Status
-🔨 In progress
+In progress - now blue team and some refactoring
