@@ -1,4 +1,4 @@
-WALK THROUGH: 
+WALK THROUGH OPERATION: 
 
 1) run the c2 server and the shell server **A MUST**
 2) plug in badusb and run

@@ -1,6 +1,6 @@
-# 🐬 Flipper Zero — BadUSB Keylogger + C2 Forensics Kit
+# Flipper Zero — BadUSB Keylogger + C2 Forensics Kit
 
-> ⚠️ **Ethical Disclaimer:** This project is strictly educational.
+> **Ethical Disclaimer:** This project is strictly educational.
 > All testing was performed on my own hardware and machines only.
 > Do not deploy this on any device you do not own. Unauthorized use is illegal.
 
@@ -21,7 +21,7 @@ to real-time detection, forensic analysis, and incident reporting.
 ## Setup
 ```bash
 python -m venv venv
-venv\Scripts\activate        # Windows
+venv\Scripts\activate        # Windows only for now
 pip install -r requirements.txt
 ```
 
