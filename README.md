@@ -6,7 +6,7 @@
 
 ## Overview
 A dual red-team / blue-team cybersecurity project demonstrating how a BadUSB keylogger
-attack works end-to-end — from deployment via Flipper Zero, to C2 communication,
+attack works end-to-end from deployment via Flipper Zero, to C2 communication,
 to real-time detection, forensic analysis, and incident reporting.
 
 ## Project Structure
