@@ -23,5 +23,11 @@ HOW TO DELETE EFFECTS
 2) delete python background process
 3) delete folder cerberus from temp
 
-ssss
+SWITCHING BRENCHES:
 
+go back to master
+git checkout master
+go back to v2
+git checkout v2
+
+*if not sure: git branch --show-current
