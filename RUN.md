@@ -23,5 +23,5 @@ HOW TO DELETE EFFECTS
 2) delete python background process
 3) delete folder cerberus from temp
 
-
+ssss
 
