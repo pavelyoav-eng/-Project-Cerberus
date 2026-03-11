@@ -44,5 +44,4 @@ def is_installed():
 
 
 if __name__ == "__main__":
-    # So deploy.ps1 can run: python persistence.py — actually installs the Run key
     install()
