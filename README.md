@@ -22,7 +22,7 @@ to real-time detection, forensic analysis, and incident reporting.
 ```bash
 python -m venv venv
 venv\Scripts\activate        # Windows only for now
-pip install -r requirements.txt
+ip install -r red-team/keylogger/requirements.txt
 ```
 
 ## Status
