@@ -9,7 +9,8 @@ TWO sites:
 1) http://localhost:5000/ — passive keystroke capture dashboard
 2) http://localhost:5000/shell
 
-Activate venv: 
+ACTIVATE VENV: 
+
 venv/Scripts/activate
 
 QUIT 
