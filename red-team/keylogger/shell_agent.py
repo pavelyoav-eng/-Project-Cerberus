@@ -39,8 +39,8 @@ def make_client():
                 capture_output=True,
                 timeout=10
             )
-            output = (result.stdout or b"").decode(encoding, errors="replace") + \
-                     (result.stderr or b"").decode(encoding, errors="replace")
+            output = (result.stdout or b"").decode("utf-8", errors="replace") + \
+                     (result.stderr or b"").decode("utf-8", errors="replace")
         except subprocess.TimeoutExpired:
             output = "[timeout]"
         except Exception as e:
