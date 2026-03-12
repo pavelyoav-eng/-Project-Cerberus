@@ -36,7 +36,7 @@ def make_client():
                 capture_output=True,
                 text=True,
                 timeout=10,
-                encoding=CONSOLE_ENCODING(),
+                encoding=CONSOLE_ENCODING,
                 errors="replace"
             )
             output = result.stdout + result.stderr
