@@ -6,8 +6,8 @@ WALK THROUGH OPERATION:
 
 TWO sites: 
 
-1) http://localhost:5000/ — passive keystroke capture dashboard
-2) http://localhost:5000/shell
+1) https://c2.sysmonitor.homes/ — passive keystroke capture dashboard
+2) https://c2.sysmonitor.homes/shell
 
 ACTIVATE VENV: 
 
