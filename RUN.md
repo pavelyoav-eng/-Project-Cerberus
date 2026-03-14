@@ -26,15 +26,9 @@ HOW TO DELETE EFFECTS
 
 SWITCHING BRENCHES:
 
-<<<<<<< HEAD
-# go back to master
-git checkout master
-# go back to v2
-=======
 go back to master
 git checkout master
 go back to v2
->>>>>>> v2.0
 git checkout v2
 
 *if not sure: git branch --show-current
