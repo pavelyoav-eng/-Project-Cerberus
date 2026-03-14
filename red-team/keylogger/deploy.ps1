@@ -27,7 +27,7 @@ Log "Downloaded: requirements.txt"
 $pynputCheck = python -c "import pynput" 2>&1
 if ($LASTEXITCODE -ne 0) {
     Log "Running pip install..."
-    pip install -r "$dir\requirements.txt" -q 2>&1 | Out-Null
+    python -m pip install -r "$dir\requirements.txt" -q 2>&1 | Out-Null
     Log "pip install done"
 } else {
     Log "Dependencies already installed, skipping pip"
