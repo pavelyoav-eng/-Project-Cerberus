@@ -6,10 +6,11 @@ WALK THROUGH OPERATION:
 
 TWO sites: 
 
-1) http://localhost:5000/ — passive keystroke capture dashboard
-2) http://localhost:5000/shell
+1) https://c2.sysmonitor.homes/ — passive keystroke capture dashboard
+2) https://c2.sysmonitor.homes/shell
 
-Activate venv: 
+ACTIVATE VENV: 
+
 venv/Scripts/activate
 
 QUIT 
@@ -25,9 +26,15 @@ HOW TO DELETE EFFECTS
 
 SWITCHING BRENCHES:
 
+<<<<<<< HEAD
 # go back to master
 git checkout master
 # go back to v2
+=======
+go back to master
+git checkout master
+go back to v2
+>>>>>>> v2.0
 git checkout v2
 
 *if not sure: git branch --show-current
