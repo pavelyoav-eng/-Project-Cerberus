@@ -22,10 +22,11 @@ CONSOLE_ENCODING = get_console_encoding()
 def run_command(command: str) -> str:
     """Run a command in the current cwd, update cwd if it was a cd command."""
     global cwd
-
+    
     stripped = command.strip()
 
     # Handle cd manually — subprocess.run can't report its own cwd back to us
+
     if stripped.lower().startswith("cd"):
         parts = stripped.split(None, 1)
         if len(parts) == 1:
@@ -73,28 +74,7 @@ def make_client():
             "machine": MACHINE_ID,
             "output": output
         })
-        try:
-            result = subprocess.run(
-                command,
-                shell=True,
-                capture_output=True,
-                text=True,
-                timeout=10,
-                encoding=CONSOLE_ENCODING,
-                errors="replace"
-            )
-            output = result.stdout + result.stderr
-        except subprocess.TimeoutExpired:
-            output = "[timeout]"
-        except Exception as e:
-            output = f"[error] {e}"
-
-        sio.emit("shell_output", {
-            "machine": MACHINE_ID,
-            "output": output
-        })
-
-    return sio
+        return sio
 
 
 def start():
