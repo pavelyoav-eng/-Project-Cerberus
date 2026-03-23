@@ -5,3 +5,4 @@ __pycache__/
 captured_data/
 .env
 red-team/c2-server/database/logs.db
+.cursor/
