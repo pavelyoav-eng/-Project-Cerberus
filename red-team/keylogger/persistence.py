@@ -41,3 +41,7 @@ def is_installed():
         return True
     except Exception:
         return False
+
+
+if __name__ == "__main__":
+    install()

