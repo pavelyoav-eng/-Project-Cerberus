@@ -169,7 +169,7 @@
 <body>
 
 <header>
-    <h1>cerberus <span class="dim">// c2</span></h1>
+    <h1>cerberus <span class="dim"> :  c2</span></h1>
     <div class="tabs">
         <button id="tab-keystrokes" class="tab active" onclick="showTab('keystrokes')">Keystrokes</button>
         <button id="tab-shell"      class="tab"        onclick="showTab('shell')">Remote Shell</button>
@@ -253,10 +253,10 @@
             renderLogs(rows);
             const ts = new Date().toLocaleTimeString();
             document.getElementById('status-bar').textContent =
-                `// updated ${ts}  —  ${rows.length} entries`;
+                `updated ${ts}  —  ${rows.length} entries`;
         } catch (e) {
             document.getElementById('status-bar').textContent =
-                '// connection error — retrying...';
+                'connection error — retrying...';
         }
     }
 
