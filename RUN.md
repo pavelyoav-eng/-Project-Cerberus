@@ -31,4 +31,8 @@ git checkout master
 go back to v2
 git checkout v2
 
-*if not sure: git branch --show-current
+*if not sure: git branch --show-current 
+
+MERGING
+
+git <branch i want to add stuff to> <feature branch>
